@@ -140,5 +140,21 @@
   <script src="./nexus-core.js?v=1"></script>
   <script>if('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js?v=1');</script>
   <script src="./icon-picker.js?v=1"></script>
+  <script>
+    let deferredInstall = null;
+    window.addEventListener('beforeinstallprompt', e => {
+      e.preventDefault();
+      deferredInstall = e;
+      const hdr = document.querySelector('header div:last-child');
+      if (hdr && !document.getElementById('nxNativeInstallBtn')) {
+        const b = document.createElement('button');
+        b.id = 'nxNativeInstallBtn';
+        b.className = 'px-2.5 py-1.5 rounded-xl bg-emerald-500 text-slate-950 text-left animate-pulse';
+        b.innerHTML = '<span class="block text-[11px] font-black">Install App</span><span class="block text-[9px] font-bold">Add to Phone</span>';
+        b.onclick = async () => { if (deferredInstall) { deferredInstall.prompt(); await deferredInstall.userChoice; b.remove(); } };
+        hdr.prepend(b);
+      }
+    });
+  </script>
 </body>
 </html>
