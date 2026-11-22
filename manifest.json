@@ -1,22 +1,22 @@
 {
-  "id": "/Forge-Nexus-v6/",
-  "name": "Forge Nexus HQ",
+  "id": "/Forge-Nexus-v7/",
+  "name": "Forge Nexus",
   "short_name": "Forge Nexus",
-  "start_url": "/Forge-Nexus/?launch=pwa_forced",
+  "start_url": "/Forge-Nexus/",
   "scope": "/Forge-Nexus/",
   "display": "standalone",
-  "orientation": "any",
+  "orientation": "portrait",
   "background_color": "#09050f",
   "theme_color": "#2e1065",
   "icons": [
     {
-      "src": "./icon.png?v=9",
+      "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAgAAAAIACAIAAAB7GkOtAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH6gMWCxYAAABGSURBVHja7cExAQAAAMKg9U9tCj+gAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA4GcGAAAB3f8K0QAAAABJRU5ErkJggg==",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "./icon.png?v=9",
+      "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAgAAAAIACAIAAAB7GkOtAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH6gMWCxYAAABGSURBVHja7cExAQAAAMKg9U9tCj+gAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA4GcGAAAB3f8K0QAAAABJRU5ErkJggg==",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
