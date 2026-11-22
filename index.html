@@ -2,15 +2,141 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
   <title>Forge Nexus</title>
   <link rel="manifest" href="manifest.json?v=1">
   <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body{font-family:system-ui,-apple-system,sans-serif;overscroll-behavior:none;overflow-x:hidden;}
+    .nx-cosmic{background:radial-gradient(circle at 20% 10%,#2e1065 0%,#09050f 55%,#020617 100%);color:#f8fafc;}
+    .nx-crimson{background:radial-gradient(circle at 80% 10%,#4c0519 0%,#09090b 60%,#000 100%);color:#f8fafc;}
+    .nx-cyber{background:radial-gradient(circle at 50% 0%,#083344 0%,#020617 65%,#000 100%);color:#f0f9ff;}
+    .nx-emerald{background:radial-gradient(circle at 30% 15%,#064e3b 0%,#09090b 65%,#000 100%);color:#ecfdf5;}
+    .glass{background:rgba(15,10,28,0.72);backdrop-filter:blur(14px);border:1px solid rgba(168,85,247,0.28);}
+    @keyframes pulseGlow{0%,100%{box-shadow:0 0 18px rgba(192,132,252,0.22);}50%{box-shadow:0 0 30px rgba(56,189,248,0.38);}}
+    .portal-card{animation:pulseGlow 5s infinite ease-in-out;}
+  </style>
 </head>
-<body class="bg-zinc-950 text-white min-h-screen flex items-center justify-center p-6">
-  <div class="text-center space-y-2">
-    <h1 class="text-2xl font-black">Forge Nexus</h1>
-    <p class="text-xs text-zinc-400">Ready for Patch 1 via App Forge</p>
+<body class="nx-cosmic min-h-screen flex flex-col relative">
+  <canvas id="nxStarfield" class="fixed inset-0 w-full h-full pointer-events-none z-0"></canvas>
+
+  <header class="relative z-20 glass border-b border-fuchsia-500/25 px-3.5 py-2.5 flex items-center justify-between gap-2 sticky top-0">
+    <div class="flex items-center gap-2.5 min-w-0">
+      <img src="./icon.png" onerror="this.style.display='none'" class="w-9 h-9 rounded-xl border border-fuchsia-400/50 object-cover">
+      <div class="min-w-0">
+        <div class="text-sm font-black tracking-wider bg-gradient-to-r from-fuchsia-300 via-cyan-300 to-amber-200 bg-clip-text text-transparent">FORGE NEXUS</div>
+        <div id="nxClockLine" class="text-[10px] font-mono text-slate-400 truncate">Command Portal • Loading...</div>
+      </div>
+    </div>
+    <div class="flex items-center gap-1.5 shrink-0">
+      <button id="nxAddBtn" class="px-2.5 py-1.5 rounded-xl bg-fuchsia-600/80 border border-fuchsia-300/40 text-left">
+        <span class="block text-[11px] font-black text-white">+ Add App</span>
+        <span class="block text-[9px] text-fuchsia-100/80">Pin URL/Repo</span>
+      </button>
+      <button id="nxSettingsBtn" class="px-2.5 py-1.5 rounded-xl bg-slate-900/90 border border-cyan-400/40 text-left">
+        <span class="block text-[11px] font-black text-cyan-300">Settings</span>
+        <span class="block text-[9px] text-slate-400">26 Features</span>
+      </button>
+    </div>
+  </header>
+
+  <div id="nxDockBar" class="relative z-20 px-3 pt-2.5 flex items-center gap-2 overflow-x-auto"></div>
+
+  <section class="relative z-20 px-3 pt-2.5 space-y-2">
+    <div class="flex gap-1.5">
+      <input id="nxSearchIn" placeholder="Search apps, tags, or descriptions..." class="flex-1 glass rounded-xl px-3 py-2 text-xs text-white placeholder-slate-400 focus:outline-none focus:border-cyan-400">
+      <button id="nxPingAllBtn" class="px-2.5 py-1.5 rounded-xl glass text-left shrink-0">
+        <span class="block text-[11px] font-black text-emerald-300">Ping All</span>
+        <span class="block text-[9px] text-slate-400">Live check</span>
+      </button>
+      <button id="nxLayoutBtn" class="px-2.5 py-1.5 rounded-xl glass text-left shrink-0">
+        <span class="block text-[11px] font-black text-amber-300">Grid</span>
+        <span class="block text-[9px] text-slate-400">View size</span>
+      </button>
+    </div>
+    <div id="nxCatBar" class="flex items-center gap-1.5 overflow-x-auto pb-0.5"></div>
+  </section>
+
+  <main class="relative z-20 flex-1 p-3 pb-24">
+    <div id="nxAppsGrid" class="grid grid-cols-2 gap-3"></div>
+  </main>
+
+  <div id="nxNoteStrip" class="fixed bottom-0 inset-x-0 z-20 glass border-t border-fuchsia-500/25 px-3 py-2 flex items-center gap-2">
+    <span class="text-[10px] font-black uppercase text-fuchsia-300 shrink-0">Scratchpad</span>
+    <input id="nxQuickNote" placeholder="Quick command note (auto-saved)..." class="flex-1 bg-black/50 border border-slate-700/70 rounded-lg px-2.5 py-1 text-xs text-white">
+    <button id="nxCopyNoteBtn" class="px-2.5 py-1 rounded-lg bg-slate-800 text-[10px] font-bold text-cyan-300 shrink-0">Copy</button>
   </div>
+
+  <div id="nxEditModal" class="hidden fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-3">
+    <div class="w-full max-w-md glass rounded-2xl p-4 space-y-2.5 max-h-[88vh] overflow-y-auto">
+      <div class="flex justify-between items-center">
+        <span id="nxEditTitle" class="text-xs font-black uppercase text-fuchsia-300">Add / Edit App</span>
+        <button id="nxCloseEdit" class="px-2.5 py-1 rounded-lg bg-slate-800 text-xs text-white font-bold">Close</button>
+      </div>
+      <input id="appNameIn" placeholder="App Name (e.g. Heist Board)" class="w-full bg-black/70 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white">
+      <input id="appUrlIn" placeholder="Live URL (https://badpeachring.github.io/...)" class="w-full bg-black/70 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white">
+      <input id="appIconIn" placeholder="Icon URL (or leave blank for auto-icon)" class="w-full bg-black/70 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white">
+      <div class="grid grid-cols-2 gap-2">
+        <input id="appCatIn" placeholder="Category (e.g. Builders, Ops, AI)" class="bg-black/70 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white">
+        <input id="appBadgeIn" placeholder="Badge (e.g. LIVE, v2, OPS)" class="bg-black/70 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white">
+      </div>
+      <textarea id="appDescIn" rows="3" placeholder="Detailed description shown under the big icon..." class="w-full bg-black/70 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white"></textarea>
+      <div class="flex gap-2">
+        <button id="nxSaveAppBtn" class="flex-1 py-2.5 rounded-xl bg-fuchsia-600 text-white text-xs font-black">Save App Card</button>
+        <button id="nxDelAppBtn" class="hidden px-3 py-2.5 rounded-xl bg-rose-950 border border-rose-500/40 text-rose-300 text-xs font-bold">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="nxSettingsModal" class="hidden fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex items-center justify-center p-3">
+    <div class="w-full max-w-md glass rounded-2xl p-4 space-y-3 max-h-[88vh] overflow-y-auto">
+      <div class="flex justify-between items-center">
+        <div>
+          <div class="text-xs font-black uppercase text-cyan-300">Forge Nexus Settings &amp; Toolkit</div>
+          <div class="text-[10px] text-slate-400">Customize backdrop, auto-sync repos &amp; inspect all 26 features</div>
+        </div>
+        <button id="nxCloseSettings" class="px-2.5 py-1 rounded-lg bg-slate-800 text-xs text-white font-bold">Close</button>
+      </div>
+
+      <div class="space-y-1.5">
+        <div class="text-[11px] font-black text-fuchsia-300">Cosmic Backdrop &amp; Particle Controls</div>
+        <div id="nxThemeRow" class="grid grid-cols-2 gap-1.5"></div>
+        <div class="flex items-center justify-between pt-1">
+          <span class="text-[11px] text-slate-300">Animated Starfield &amp; Nebula</span>
+          <input id="nxStarsToggle" type="checkbox" checked class="w-4 h-4 accent-fuchsia-500">
+        </div>
+      </div>
+
+      <div class="space-y-1.5 border-t border-slate-800 pt-2.5">
+        <div class="text-[11px] font-black text-emerald-300">GitHub Auto-Discovery (Pull All Your Repos)</div>
+        <div class="flex gap-1.5">
+          <input id="nxGhUserIn" value="badpeachring" class="flex-1 bg-black/70 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white font-mono">
+          <button id="nxSyncGhBtn" class="px-3 py-1.5 rounded-lg bg-emerald-600 text-white text-xs font-black">Sync Repos</button>
+        </div>
+        <div class="grid grid-cols-2 gap-1.5 pt-1">
+          <button id="nxExportBtn" class="py-1.5 px-2 rounded-lg bg-slate-800 text-[11px] font-bold text-cyan-200">Export Portal JSON</button>
+          <button id="nxImportBtn" class="py-1.5 px-2 rounded-lg bg-slate-800 text-[11px] font-bold text-amber-200">Import Portal JSON</button>
+        </div>
+      </div>
+
+      <div class="space-y-1.5 border-t border-slate-800 pt-2.5">
+        <div class="text-[11px] font-black text-amber-300">All 26 Built-In Forge Nexus Features &amp; Tools</div>
+        <div id="nxFeatureList" class="space-y-1 text-[11px] text-slate-300 bg-black/60 border border-slate-800 rounded-xl p-2.5 max-h-60 overflow-y-auto"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="nxPreviewModal" class="hidden fixed inset-0 z-50 bg-black/95 flex flex-col">
+    <div class="bg-slate-950 border-b border-slate-800 px-3 py-2 flex items-center justify-between gap-2">
+      <span id="nxPrevName" class="text-xs font-black text-cyan-300 truncate">Quick Peek</span>
+      <div class="flex gap-1.5">
+        <a id="nxPrevFullLink" target="_blank" class="px-2.5 py-1 rounded-lg bg-emerald-600 text-white text-[11px] font-black">Open Full Tab</a>
+        <button id="nxClosePrev" class="px-2.5 py-1 rounded-lg bg-slate-800 text-white text-[11px] font-bold">Close</button>
+      </div>
+    </div>
+    <iframe id="nxPrevFrame" class="flex-1 w-full bg-black border-0"></iframe>
+  </div>
+
+  <script src="./nexus-core.js?v=1"></script>
 </body>
 </html>
