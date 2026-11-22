@@ -1,22 +1,22 @@
 {
-  "id": "/Forge-Nexus/",
-  "name": "Forge Nexus",
+  "id": "/Forge-Nexus-v6/",
+  "name": "Forge Nexus HQ",
   "short_name": "Forge Nexus",
-  "start_url": "/Forge-Nexus/",
+  "start_url": "/Forge-Nexus/?launch=pwa_forced",
   "scope": "/Forge-Nexus/",
   "display": "standalone",
-  "orientation": "portrait",
+  "orientation": "any",
   "background_color": "#09050f",
-  "theme_color": "#09050f",
+  "theme_color": "#2e1065",
   "icons": [
     {
-      "src": "./icon.png?v=5",
+      "src": "./icon.png?v=9",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "./icon.png?v=5",
+      "src": "./icon.png?v=9",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
