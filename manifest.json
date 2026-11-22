@@ -4,18 +4,18 @@
   "start_url": "/Forge-Nexus/",
   "scope": "/Forge-Nexus/",
   "display": "standalone",
-  "background_color": "#09090b",
-  "theme_color": "#18181b",
+  "background_color": "#09050f",
+  "theme_color": "#09050f",
   "icons": [
     {
-      "src": "/Forge-Nexus/icon.png",
-      "sizes": "512x512",
+      "src": "./icon.png?v=2",
+      "sizes": "512x512 1024x1024",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/Forge-Nexus/icon.png",
-      "sizes": "512x512",
+      "src": "./icon.png?v=2",
+      "sizes": "512x512 1024x1024",
       "type": "image/png",
       "purpose": "maskable"
     }
